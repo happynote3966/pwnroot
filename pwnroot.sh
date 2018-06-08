@@ -70,25 +70,20 @@ which env >> command.txt
 SOCAT_PATH=$(dirname $(which socat))
 echo "[+] SOCAT path is $SOCAT_PATH"
 
-cat command.txt | xargs dirname | uniq | cut -b 2- | xargs mkdir -p
-
 ldd $BINARY_PATH > lddlist.txt
 
 for command_name in `cat command.txt`
 do
-  cp "$command_name" "`dirname $command_name | cut -b 2- `/"
+  cp --parents $command_name ./
   ldd $command_name >> lddlist.txt
 done
 
-# create library directory
 cat lddlist.txt | grep -e "/\S*" -o | sort | uniq > lddlist_optimize.txt
-cat lddlist_optimize.txt | xargs dirname | uniq | cut -b 2- | xargs mkdir -p
-
 
 # copy library
 for ldd_name in `cat lddlist_optimize.txt`
 do
-  cp "$ldd_name" "`dirname $ldd_name | cut -b 2-`/"
+  cp --parents "$ldd_name" ./
 done
 
 # delete temp files
